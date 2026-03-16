@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Context-Aware Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="header-info">
+                <h1>AI Buddy</h1>
+                <p>Lightweight NLP + Context Memory</p>
+            </div>
+            <button id="reset-btn" title="Reset Session Memory">Reset Context</button>
+        </header>
+
+        <main id="chat-box" class="chat-box">
+            <!-- Messages will be appended here dynamically -->
+            <div class="message bot-message">
+                Hello! I am an AI chatbot with conversation memory. How can I help you?
+            </div>
+        </main>
+
+        <footer class="chat-input-area">
+            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+            <button id="send-btn">Send</button>
+        </footer>
+    </div>
+
+    <!-- Script for handling UI and REST API communication -->
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        function appendMessage(sender, text, confidence = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+            
+            let htmlContent = `<p>${text}</p>`;
+            
+            // Add a small confidence score indicator if available
+            if (confidence !== null && sender === 'bot') {
+                const confPercent = (confidence * 100).toFixed(1);
+                htmlContent += `<span class="confidence-score">Confidence: ${confPercent}%</span>`;
+            }
+
+            msgDiv.innerHTML = htmlContent;
+            chatBox.appendChild(msgDiv);
+            
+            // Auto-scroll to the bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Show user message on screen
+            appendMessage('user', message);
+            userInput.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    appendMessage('bot', "Error: " + data.error);
+                } else {
+                    appendMessage('bot', data.response, data.confidence);
+                }
+            } catch (error) {
+                appendMessage('bot', "Network error: " + error.message);
+            }
+        }
+
+        async function resetSession() {
+            try {
+                await fetch('/api/reset', { method: 'POST' });
+                chatBox.innerHTML = ''; // Clear chat area
+                appendMessage('bot', 'Session context has been reset. How can I help you?');
+            } catch (error) {
+                console.error("Reset failed", error);
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetSession);
+    </script>
+</body>
+</html>

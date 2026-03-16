@@ -1,0 +1,30 @@
+[
+  {
+    "question": "What is your name?",
+    "answer": "I am a lightweight AI context-aware chatbot."
+  },
+  {
+    "question": "How does your memory work?",
+    "answer": "I remember the last 5 messages of our conversation using an in-memory session window."
+  },
+  {
+    "question": "What technology are you built with?",
+    "answer": "I am built with Python, Flask, and Scikit-learn using TF-IDF and Cosine Similarity."
+  },
+  {
+    "question": "Can you handle semantic similarity?",
+    "answer": "Yes! Even if you do not type my exact questions, I can find the closest match using TF-IDF vectorization and cosine similarity computation."
+  },
+  {
+    "question": "What is artificial intelligence?",
+    "answer": "Artificial intelligence is the simulation of human intelligence processes by machines, especially computer systems."
+  },
+  {
+    "question": "Tell me a joke.",
+    "answer": "Why do programmers prefer dark mode? Because light attracts bugs!"
+  },
+  {
+    "question": "How are you deployed?",
+    "answer": "You can deploy me on any basic server! Since my size is less than 20MB, I fit perfectly in simple cloud deployments or a Raspberry Pi."
+  }
+]
